@@ -11,4 +11,8 @@ Very Work In Progress
 * source venv/bin/activate 
 * pip install -r  requirements.txt
 * copy wikitolearn_family.py to 'venv/lib/python2.7/site-packages/pywikibot/families'
-* python bot.py
+* edit
+* python bot.py <r|a> [minutes]
+	* r if you want to scan recent pages
+		* also pass 'minutes', pages changed in the last 'minutes' minutes will be checked
+	* a if you want to scan all scannable pages   

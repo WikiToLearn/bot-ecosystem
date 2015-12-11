@@ -3,7 +3,12 @@ import requests
 import urlparse
 from bs4 import BeautifulSoup
 import time
+import datetime
+import sys
 
+##Telegram Stuff
+TG_API_KEY = ""
+TG_CHAT_ID = ""
 
 def checkPage(page_url):
 	headers = {
@@ -28,36 +33,53 @@ def checkPage(page_url):
 			status = r_checkStatus.json()[u"status"]
 
 			if(status["progress"] == "100.00"):
-				return True
+				return True, "Converted to PDF"
 
 			if("error" in status["status"].lower()):
-				return status["status"]
+				return False, status["status"]
 
 			time.sleep(1)
-		#print(dom_pdf.find(id='firstHeading'))
 	else:
-		return "No PDF can be downloaded for this page"
+		return True, "No PDF can be downloaded for this page"
+
 
 
 if __name__ == "__main__":
+
+	MODE = sys.argv[1].lower() #"r" for recent or "a" for all 
+
 	site = pywikibot.Site()
-	pages = site.recentchanges()
+	if MODE == "r":
+		DELTATIME = int(sys.argv[2]) #in minutes
+		pages = site.recentchanges(topOnly = True, end=site.getcurrenttime()- datetime.timedelta(minutes=DELTATIME))
+	else:
+		pages = site.allpages()
 
 	i = 0
 	for page in pages:
-		page_title = page[u"title"]
+		if MODE == "r":
+			page_title = page[u'title']
+		else: #no idea why allpages() does not return pages with [u'title'] as keys 
+			page_title = page.title()
 		page_url = pywikibot.Page(site, page_title).full_url()
 
 		print("Checking '" + page_title + "'")
 
-		res = checkPage(page_url)
-		if(res is True):
-			print("\t'" + page_title + "' can be converted to PDF")
+		valid, message = checkPage(page_url)
+		if(valid is True):
+			print("\t" + page_title + ": " + message)
 		else:
-			print("\t'" + page_title + "' - " + res)
+			print("\t" + page_title + ": " + message)
+			payload = { 'chat_id': TG_CHAT_ID, 
+						'text': "[" + page_title + "](" + page_url + ") can't be converted to PDF!",
+						'parse_mode': 'Markdown' }
+
+			requests.get("https://api.telegram.org/bot" + TG_API_KEY + "/sendmessage", params=payload);
 
 		print("")
 
-		i+=1
-		if(i==10):
-			break
+		time.sleep(1)
+
+		i+=1;
+
+	print("Scanned " + str(i) + " pages")
