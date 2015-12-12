@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-mylang='it'
+mylang='devit'
 family = 'wikitolearn'
-usernames['wikitolearn']['it']=u'PdfBot'
 console_encoding = 'utf-8'
