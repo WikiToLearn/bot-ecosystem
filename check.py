@@ -82,7 +82,7 @@ if __name__ == "__main__":
 
 	for page in pages:
 		if MODE == "r":
-			page_title = page[u'title']
+			page_title = page[u'title'].encode('utf8')
 		else: #no idea why allpages() does not return pages with [u'title'] as keys 
 			page_title = page.title().encode('utf8')
 		print("" + page_title + "")
