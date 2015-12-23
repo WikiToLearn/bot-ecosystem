@@ -17,7 +17,7 @@ BASE_SITE = ""
 def checkPage(page_url):
 	try:
 		headers = {
-			'User-Agent': 'PDF Bot - WikiToLearn'
+			'User-Agent': 'PDF Check - WikiToLearn'
 		}
 		r = requests.get(page_url, headers=headers)
 
@@ -100,7 +100,8 @@ if __name__ == "__main__":
 						'parse_mode': 'Markdown' }
 
 			#notify telegram
-			requests.get("https://api.telegram.org/bot" + TG_API_KEY + "/sendmessage", params=payload)
+			if MODE == "r"
+				requests.get("https://api.telegram.org/bot" + TG_API_KEY + "/sendmessage", params=payload)
 
 		print("")
 
