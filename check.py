@@ -9,8 +9,8 @@ import sys
 config = __import__("user-config")
 
 ##Telegram Stuff
-TG_API_KEY = ""
-TG_CHAT_ID = ""
+TG_API_KEY = "178647524:AAG7hkTnFLU1x7nRYqhGQAemxPsloUbj9ik"
+TG_CHAT_ID = "@wtlpdfcheck"
 
 BASE_SITE = ""
 
@@ -84,7 +84,7 @@ if __name__ == "__main__":
 		if MODE == "r":
 			page_title = page[u'title']
 		else: #no idea why allpages() does not return pages with [u'title'] as keys 
-			page_title = page.title()
+			page_title = page.title().encode('utf8')
 		print("" + page_title + "")
 
 		page_url = pywikibot.Page(site, page_title).full_url()
@@ -100,7 +100,7 @@ if __name__ == "__main__":
 						'parse_mode': 'Markdown' }
 
 			#notify telegram
-			if MODE == "r"
+			if MODE == "r":
 				requests.get("https://api.telegram.org/bot" + TG_API_KEY + "/sendmessage", params=payload)
 
 		print("")
