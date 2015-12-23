@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-mylang='it'
+import os
+mylang= os.path.expandvars("$PYWIKIBOT_LANG")
 family = 'wikitolearn'
 console_encoding = 'utf-8'
 
