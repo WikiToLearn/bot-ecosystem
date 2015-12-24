@@ -101,8 +101,7 @@ if __name__ == "__main__":
 
 			#notify telegram
 			if MODE == "r":
-				#requests.get("https://api.telegram.org/bot" + TG_API_KEY + "/sendmessage", params=payload)
-				pass
+				requests.get("https://api.telegram.org/bot" + TG_API_KEY + "/sendmessage", params=payload)
 
 		print("")
 
