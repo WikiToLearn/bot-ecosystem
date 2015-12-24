@@ -1,16 +1,16 @@
 import pywikibot
 import requests
-import urlparse
+import urllib.parse as urlparse
 from bs4 import BeautifulSoup
 import time
 import datetime
 import sys
-
+import os
 config = __import__("user-config")
 
 ##Telegram Stuff
-TG_API_KEY = "178647524:AAG7hkTnFLU1x7nRYqhGQAemxPsloUbj9ik"
-TG_CHAT_ID = "@wtlpdfcheck"
+TG_API_KEY = os.environ['TG_API_KEY']
+TG_CHAT_ID = os.environ['TG_CHAT_ID']
 
 BASE_SITE = ""
 
@@ -56,7 +56,7 @@ def checkPage(page_url):
 			return True, "No PDF can be downloaded for this page"
 
 	except requests.exceptions.RequestException as e:
-	    print e
+	    print(e)
 	    sys.exit(1)
 
 
@@ -82,9 +82,9 @@ if __name__ == "__main__":
 
 	for page in pages:
 		if MODE == "r":
-			page_title = page[u'title'].encode('utf8')
+			page_title = page[u'title']
 		else: #no idea why allpages() does not return pages with [u'title'] as keys 
-			page_title = page.title().encode('utf8')
+			page_title = page.title()
 		print("" + page_title + "")
 
 		page_url = pywikibot.Page(site, page_title).full_url()
@@ -101,7 +101,8 @@ if __name__ == "__main__":
 
 			#notify telegram
 			if MODE == "r":
-				requests.get("https://api.telegram.org/bot" + TG_API_KEY + "/sendmessage", params=payload)
+				#requests.get("https://api.telegram.org/bot" + TG_API_KEY + "/sendmessage", params=payload)
+				pass
 
 		print("")
 
