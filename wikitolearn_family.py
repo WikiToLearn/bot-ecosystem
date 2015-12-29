@@ -21,6 +21,8 @@ class Family(family.Family):
             'en': 'en.wikitolearn.org',
             'devit': 'it.tuttorotto.eu',
             'deven': 'en.tuttorotto.eu',
+            'localit': 'en.tuttorotto.biz',
+            'localen': 'en.tuttorotto.biz',
         }
 
     def scriptpath(self, code):
@@ -29,6 +31,8 @@ class Family(family.Family):
             'en': '',
             'devit': '',
             'deven': '',
+            'localit': '',
+            'localen': '',
         }[code]
 
     @deprecated('APISite.version()')
@@ -38,6 +42,8 @@ class Family(family.Family):
             'en': u'1.25.2',
             'devit': u'1.25.2',
             'deven': u'1.25.2',
+            'localit': u'1.25.2',
+            'localen': u'1.25.2',
         }[code]
 
     def protocol(self, code):
@@ -46,4 +52,6 @@ class Family(family.Family):
             'en': u'http',
             'devit': u'http',
             'deven': u'http',
+            'localit': u'http',
+            'localen': u'http',
         }[code]

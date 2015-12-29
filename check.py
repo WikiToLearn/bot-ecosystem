@@ -59,19 +59,16 @@ def checkPage(page_url):
 	    print(e)
 	    sys.exit(1)
 
-
-if __name__ == "__main__":
-	
+def main(MODE,DELTATIME):	
 	print("Connecting to " + config.mylang + " domain for the " + config.family + " family")
 	site = pywikibot.Site()
-
+	
+	global BASE_SITE
 	BASE_SITE = site.family.langs[config.mylang]
 	print("Base URL: " + BASE_SITE)
-
-	MODE = sys.argv[1].lower() #"r" for recent or "a" for all 
+	
 	if MODE == "r":
 		print("Checking most recent edits")
-		DELTATIME = int(sys.argv[2]) #in minutes
 		pages = site.recentchanges(topOnly = True, end=site.getcurrenttime()- datetime.timedelta(minutes=DELTATIME))
 	else:
 		print("Checking all pages")
@@ -111,3 +108,9 @@ if __name__ == "__main__":
 
 	print("Checked " + str(checkedPages) + " pages")
 	print(str(errors) + " checks failed")
+	
+
+if __name__ == "__main__":
+        MODE = sys.argv[1].lower() #"r" for recent or "a" for all 
+        DELTATIME = int(sys.argv[2]) #in minutes
+        main(MODE,DELTATIME)
