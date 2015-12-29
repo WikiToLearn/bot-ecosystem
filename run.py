@@ -3,17 +3,20 @@ import os
 
 langs = ['it','en','devit','deven','localit','localen']
 
-#reading variables
-mode = os.environ['MODE']
-minutes = int(os.environ['MINUTES'])
+#reading lang
 lang = os.environ['PYWIKIBOT_LANG']
 
 #cheking langs
 if not lang in langs:
     print("Lang not supported. Please choose one of:")
-    for l in langs:
-        print (l)
+    print ('Production: it,en.')
+    print ('Testing: devit,deven.')
+    print ('Local: localit,localen.')
     exit(1)
+    
+#reading other pars
+mode = os.environ['MODE']
+minutes = int(os.environ['MINUTES'])
 
 #creating config
 f = open('user-config.py','w')
