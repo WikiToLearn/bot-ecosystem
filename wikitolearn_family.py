@@ -19,8 +19,8 @@ class Family(family.Family):
         self.langs = {
             'it': 'it.wikitolearn.org',
             'en': 'en.wikitolearn.org',
-            'devit': 'it.tuttorotto.eu',
-            'deven': 'en.tuttorotto.eu',
+            'devit': 'it.wikitolearn.vodka',
+            'deven': 'en.wikitolearn.vodka',
             'localit': 'en.tuttorotto.biz',
             'localen': 'en.tuttorotto.biz',
         }
