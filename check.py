@@ -99,7 +99,9 @@ def main(MODE,DELTATIME):
 			#notify telegram
 			if MODE == "r":
 				requests.get("https://api.telegram.org/bot" + TG_API_KEY + "/sendmessage", params=payload)
-
+				
+			pywikibot.Page(site, page_title).change_category(None, pywikibot.Category(site, "Broken PDF"))
+			
 		print("")
 
 		time.sleep(1)
