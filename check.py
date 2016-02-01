@@ -86,27 +86,37 @@ def main(MODE,DELTATIME):
 
 		page_url = pywikibot.Page(site, page_title).full_url()
 		
-		isCheckOK, message = checkPage(page_url)
-		if isCheckOK:
-			print("\t" + page_title + ": " + message)
-		else:
-			errors+=1
-			print("\t" + page_title + ": " + message)
-			payload = { 'chat_id': TG_CHAT_ID, 
-						'text': "[" + page_title + "](" + page_url + ") can't be converted to PDF!",
-						'parse_mode': 'Markdown' }
-
-			#notify telegram
-			if MODE == "r":
-				requests.get("https://api.telegram.org/bot" + TG_API_KEY + "/sendmessage", params=payload)
-				
-			pywikibot.Page(site, page_title).change_category(None, pywikibot.Category(site, "Broken PDF"))
+		needsCheck = true
+		for cat in pywikibot.Page(site, page_title).categories():
+			needsCheck = cat != pywikiBot.Category("Structure")
+			if not needsCheck: 
+				break
+		
+		if needsCheck:
 			
-		print("")
+			isCheckOK, message = checkPage(page_url)
+			if isCheckOK:
+				print("\t" + page_title + ": " + message)
+			else:
+				errors+=1
+				print("\t" + page_title + ": " + message)
+				payload = { 'chat_id': TG_CHAT_ID, 
+							'text': "[" + page_title + "](" + page_url + ") can't be converted to PDF!",
+							'parse_mode': 'Markdown' }
 
-		time.sleep(1)
+				#notify telegram
+				if MODE == "r":
+					requests.get("https://api.telegram.org/bot" + TG_API_KEY + "/sendmessage", params=payload)
+					
+				pywikibot.Page(site, page_title).change_category(None, pywikibot.Category(site, "Broken PDF"))
+				
+			print("")
 
-		checkedPages+=1;
+			time.sleep(1)
+
+			checkedPages+=1;
+		else:
+			print("Page " + page_url + " in structure category")
 
 	print("Checked " + str(checkedPages) + " pages")
 	print(str(errors) + " checks failed")
