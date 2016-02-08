@@ -1,4 +1,4 @@
-FROM wikitolearn/pywikibot:0.1.1
+FROM wikitolearn/pywikibot:0.1.3
 
 MAINTAINER wikitolearn sysadmin@wikitolearn.org
 ENV DEBIAN_FRONTEND noninteractive
