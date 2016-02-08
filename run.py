@@ -4,7 +4,7 @@ import os
 langs = ['it','en','devit','deven','localit','localen']
 
 #reading lang
-lang = os.environ['PYWIKIBOT_LANG']
+lang = os.environ.get(['PYWIKIBOT_LANG'])
 
 #cheking langs
 if not lang in langs:
@@ -15,8 +15,10 @@ if not lang in langs:
     exit(1)
     
 #reading other pars
-mode = os.environ['MODE']
-minutes = int(os.environ['MINUTES'])
+MODE = os.environ.get(['MODE'])
+MINUTES = int(os.environ.get(['MINUTES']) or "0")
+BOOK_URL = os.environ.get(['BOOK_URL'])
+PAGE_NAME = os.environ.get(['PAGE_NAME'])
 
 #creating config
 f = open('user-config.py','w')
@@ -24,9 +26,14 @@ f.write('# -*- coding: utf-8 -*-\n')
 f.write("mylang='"+ lang+"'\n")
 f.write("family='wikitolearn'\n")
 f.write("console_encoding = 'utf-8'\n")
+f.write("""password_file = "./passwordFile.txt"
+            usernames = {}
+            usernames[family] = {}
+            usernames[family][mylang] = u"WikiToBot"
+        """);
 f.close()
     
 import check
 
 #star process
-check.main(mode,minutes)
+check.main(MODE, MINUTES, BOOK_URL, PAGE_NAME)
