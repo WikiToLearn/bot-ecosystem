@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pywikibot
+from pywikibot import textlib
 
 import requests
 import urllib.parse as urlparse
@@ -17,6 +18,24 @@ config = __import__("user-config")
 TG_API_KEY = os.environ.get('TG_API_KEY')
 TG_CHAT_ID = os.environ.get('TG_CHAT_ID')
 
+def userPut(page, oldtext, newtext, **kwargs):
+    if oldtext == newtext:
+        return
+
+    current_page = page
+
+    page.text = newtext
+    return page.save(**kwargs)
+
+def addCategory(site, page, cat):
+    old_text = page.text
+    cats = textlib.getCategoryLinks(old_text)
+
+    catpl = pywikibot.Category(site, cat)
+    cats.append(catpl)
+    text = textlib.replaceCategoryLinks(page.text, cats, site=site)
+
+    userPut(page, old_text, text, minor=True, botflag=True)
 
 def checkPDFforPage(page_url, BASE_SITE):
     try:
@@ -129,7 +148,6 @@ def main(MODE, DELTATIME, BOOK_URL, PAGE_NAME):
 
         needsCheck = True
         for cat in pywikibot.Page(site, page_title).categories():
-            print(cat)
             if cat == pywikibot.Category(site,"Structure"):
                 needsCheck = False
                 print("Page " + page_url + " in structure category")
@@ -138,8 +156,20 @@ def main(MODE, DELTATIME, BOOK_URL, PAGE_NAME):
             isCheckOK, message = checkPDFforPage(page_url, BASE_SITE)
             if isCheckOK:
                 print("\t" + page_title + ": " + message)
+                
                 #remove cateogory
-                pywikibot.Page(site, page_title).change_category(pywikibot.Category(site, "Broken PDF"), None)
+                remove = False
+                for cat in pywikibot.Page(site, page_title).categories():
+                    if cat == pywikibot.Category(site,"Broken PDF"):
+                        remove = True
+                        break
+                
+                if remove:
+                    print("\tRemoving 'Broken PDF' category")
+                    pywikibot.Page(site, page_title).change_category(pywikibot.Category(site, "Broken PDF"), None)
+                else:
+                    print("\tNo 'Broken PDF' category to remove. No problem.")
+            
             else:
                 errors+=1
                 print("\t" + page_title + ": " + message)
@@ -150,7 +180,8 @@ def main(MODE, DELTATIME, BOOK_URL, PAGE_NAME):
                 if MODE == "b":
                     sendTelegramNotification("[" + page_title + "](" + page_url + ") in [this Book](" + BOOK_URL + ") can't be converted to PDF!")
                 
-                pywikibot.Page(site, page_title).change_category(None, pywikibot.Category(site, "Broken PDF"))
+                #ædd category
+                addCategory(site, pywikibot.Page(site, page_title), "Broken PDF")
                 
             print("")
 
