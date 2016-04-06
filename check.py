@@ -32,10 +32,11 @@ def addCategory(site, page, cat):
     cats = textlib.getCategoryLinks(old_text)
 
     catpl = pywikibot.Category(site, cat)
-    cats.append(catpl)
-    text = textlib.replaceCategoryLinks(page.text, cats, site=site)
 
-    userPut(page, old_text, text, minor=True, botflag=True)
+    if catpl not in cats:
+        cats.append(catpl)
+        text = textlib.replaceCategoryLinks(page.text, cats, site=site)
+        userPut(page, old_text, text, minor=True, botflag=True)
 
 def checkPDFforPage(page_url, BASE_SITE):
     try:
@@ -169,7 +170,7 @@ def main(MODE, DELTATIME, BOOK_URL, PAGE_NAME):
                     pywikibot.Page(site, page_title).change_category(pywikibot.Category(site, "Broken PDF"), None)
                 else:
                     print("\tNo 'Broken PDF' category to remove. No problem.")
-            
+                
             else:
                 errors+=1
                 print("\t" + page_title + ": " + message)
