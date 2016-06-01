@@ -34,9 +34,13 @@ def addCategory(site, page, cat):
     catpl = pywikibot.Category(site, cat)
 
     if catpl not in cats:
+        print(str(catpl) + " not in page cats") 
         cats.append(catpl)
         text = textlib.replaceCategoryLinks(page.text, cats, site=site)
         userPut(page, old_text, text, minor=True, botflag=True)
+        return True
+
+    return False
 
 def checkPDFforPage(page_url, BASE_SITE):
     try:
@@ -67,6 +71,7 @@ def checkPDFforPage(page_url, BASE_SITE):
                 print("\tRequesting Status " + str(checks) + "...")
                 r_checkStatus = requests.get(url_check, headers=headers)
                 checks+=1
+
                 status = r_checkStatus.json()[u"status"]
 
                 if(status["progress"] == "100.00"):
@@ -158,7 +163,7 @@ def main(MODE, DELTATIME, BOOK_URL, PAGE_NAME):
             if isCheckOK:
                 print("\t" + page_title + ": " + message)
                 
-                #remove cateogory
+                #remove category
                 remove = False
                 for cat in pywikibot.Page(site, page_title).categories():
                     if cat == pywikibot.Category(site,"Broken PDF"):
@@ -175,14 +180,17 @@ def main(MODE, DELTATIME, BOOK_URL, PAGE_NAME):
                 errors+=1
                 print("\t" + page_title + ": " + message)
 
-                #notify telegram
-                if MODE == "r":
-                    sendTelegramNotification("[" + page_title + "](" + page_url + ") can't be converted to PDF!")
-                if MODE == "b":
-                    sendTelegramNotification("[" + page_title + "](" + page_url + ") in [this Book](" + BOOK_URL + ") can't be converted to PDF!")
+                
                 
                 #ædd category
-                addCategory(site, pywikibot.Page(site, page_title), "Broken PDF")
+                needNotification = addCategory(site, pywikibot.Page(site, page_title), "Broken PDF")
+
+                if needNotification:
+                    #notify telegram
+                    if MODE == "r":
+                        sendTelegramNotification("[" + page_title + "](" + page_url + ") can't be converted to PDF!")
+                    if MODE == "b":
+                        sendTelegramNotification("[" + page_title + "](" + page_url + ") in [this Book](" + BOOK_URL + ") can't be converted to PDF!")
                 
             print("")
 
