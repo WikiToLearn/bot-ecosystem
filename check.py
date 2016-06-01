@@ -173,6 +173,7 @@ def main(MODE, DELTATIME, BOOK_URL, PAGE_NAME):
                 if remove:
                     print("\tRemoving 'Broken PDF' category")
                     pywikibot.Page(site, page_title).change_category(pywikibot.Category(site, "Broken PDF"), None)
+                    sendTelegramNotification("✅ [" + page_title + "](" + page_url + ") is now ok.")
                 else:
                     print("\tNo 'Broken PDF' category to remove. No problem.")
                 
@@ -180,23 +181,27 @@ def main(MODE, DELTATIME, BOOK_URL, PAGE_NAME):
                 errors+=1
                 print("\t" + page_title + ": " + message)
 
-                
-                
-                #ædd category
+                #add category if not already broken
                 needNotification = addCategory(site, pywikibot.Page(site, page_title), "Broken PDF")
 
                 if needNotification:
                     #notify telegram
                     if MODE == "r":
-                        sendTelegramNotification("[" + page_title + "](" + page_url + ") can't be converted to PDF!")
+                        sendTelegramNotification("❌ [" + page_title + "](" + page_url + ") can't be converted to PDF!")
                     if MODE == "b":
-                        sendTelegramNotification("[" + page_title + "](" + page_url + ") in [this Book](" + BOOK_URL + ") can't be converted to PDF!")
+                        sendTelegramNotification("❌ [" + page_title + "](" + page_url + ") in [this Book](" + BOOK_URL + ") can't be converted to PDF!")
                 
             print("")
 
             time.sleep(1)
 
             checkedPages+=1;            
+        else: 
+        #it is a structure page, remove the optional "Broken PDF" category
+            for cat in pywikibot.Page(site, page_title).categories():
+                if cat == pywikibot.Category(site,"Broken PDF"):
+                    print("\tRemoving 'Broken PDF' category from 'Structure' page.")
+                    pywikibot.Page(site, page_title).change_category(pywikibot.Category(site, "Broken PDF"), None)
 
     print("Checked " + str(checkedPages) + " pages")
     print(str(errors) + " checks failed")
