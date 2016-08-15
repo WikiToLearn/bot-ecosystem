@@ -106,6 +106,7 @@ config = yaml.load(stream, Loader=yaml.Loader)
 DELTATIME=config['global']['deltatime']
 
 running = True
+time_debit = 0
 while running:
     unix_time_start = int(time.time())
     for lang in config['pywikibot']['langs']:
@@ -133,7 +134,7 @@ while running:
                 else:
                     site._loginstatus = LoginStatus.NOT_LOGGED_IN  # failure
 
-        recentchanges = site.recentchanges(topOnly = True, end=site.getcurrenttime()- datetime.timedelta(seconds=DELTATIME))
+        recentchanges = site.recentchanges(topOnly = True, end=site.getcurrenttime()- (datetime.timedelta(seconds=DELTATIME)+ time_debit))
         for recentchange in recentchanges:
             page_title = recentchange['title']
             page = pywikibot.Page(site,page_title)
@@ -157,6 +158,11 @@ while running:
             print(recentchange)
         print("\n")
     unix_time_end = int(time.time())
-    print("Wait for: {} s".format(DELTATIME - (unix_time_end-unix_time_start)))
-    for s in range(0,DELTATIME - (unix_time_end-unix_time_end)):
-        time.sleep(1)
+    waiting_time=DELTATIME - (unix_time_end-unix_time_start))
+    if waiting_time > 0:
+        print("Wait for: {} s".format(waiting_time)
+        for s in range(0,DELTATIME - (unix_time_end-unix_time_end)):
+            time.sleep(1)
+        time_debit = 0
+    else:
+        time_debit = -1 * waiting_time
