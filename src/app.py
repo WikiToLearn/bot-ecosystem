@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import yaml
 import os, sys
+import wtlpywikibot
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot import textlib
@@ -117,24 +118,9 @@ while running:
             if 'username' in config['pywikibot'] and 'password' in config['pywikibot']:
                 username=config['pywikibot']['username']
                 password=config['pywikibot']['password']
-                sysop = False #ancora da capire ocsa fa sto flag
-                site._loginstatus = LoginStatus.IN_PROGRESS
-                if hasattr(site, "_userinfo"):
-                    del site._userinfo
+                wtlpywikibot.login(lang,'wikitolearn',username,password)
 
-                loginMan = api.LoginManager(site=site, sysop=sysop,
-                                         user=username, password=password)
-                if loginMan.login(retry=True):
-                    site._username[sysop] = loginMan.username
-                    if hasattr(site, "_userinfo"):
-                        del site._userinfo
-                    site.getuserinfo()
-                    site._loginstatus = (LoginStatus.AS_SYSOP
-                        if sysop else LoginStatus.AS_USER)
-                else:
-                    site._loginstatus = LoginStatus.NOT_LOGGED_IN  # failure
-
-        recentchanges = site.recentchanges(topOnly = True, end=site.getcurrenttime()- (datetime.timedelta(seconds=DELTATIME)+ time_debit))
+        recentchanges = site.recentchanges(topOnly = True, end=site.getcurrenttime()- (datetime.timedelta(seconds=(DELTATIME+ time_debit))))
         for recentchange in recentchanges:
             page_title = recentchange['title']
             page = pywikibot.Page(site,page_title)
@@ -158,10 +144,10 @@ while running:
             print(recentchange)
         print("\n")
     unix_time_end = int(time.time())
-    waiting_time=DELTATIME - (unix_time_end-unix_time_start))
+    waiting_time=DELTATIME - (unix_time_end-unix_time_start)
     if waiting_time > 0:
-        print("Wait for: {} s".format(waiting_time)
-        for s in range(0,DELTATIME - (unix_time_end-unix_time_end)):
+        print("Wait for: {} s".format(waiting_time))
+        for s in range(0, DELTATIME - (unix_time_end - unix_time_end)):
             time.sleep(1)
         time_debit = 0
     else:
