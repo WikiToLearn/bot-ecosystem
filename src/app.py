@@ -31,13 +31,12 @@ while running:
         site = pywikibot.Site(lang,'wikitolearn')
         site_hostname = site.family.hostname(lang)
 
-        if 'pywikibot' in config:
-            if 'username' in config['pywikibot'] and 'password' in config['pywikibot']:
-                username=config['pywikibot']['username']
-                password=config['pywikibot']['password']
-                wtlpywikibot.login(site,username,password)
+        if 'pywikibot' in config and 'username' in config['pywikibot'] and 'password' in config['pywikibot']:
+            username=config['pywikibot']['username']
+            password=config['pywikibot']['password']
+            wtlpywikibot.login(site,username,password)
 
-        recentchanges = site.recentchanges(topOnly = True, end=site.getcurrenttime()- (datetime.timedelta(seconds=(DELTATIME+ time_debit))))
+        recentchanges = site.recentchanges(topOnly = True, end=site.getcurrenttime()- (datetime.timedelta(seconds=DELTATIME+ time_debit)))
         for recentchange in recentchanges:
             page_title = recentchange['title']
             page = pywikibot.Page(site,page_title)
