@@ -1,4 +1,4 @@
-FROM wikitolearn/pywikibot:0.2.3
+FROM wikitolearn/pywikibot:0.2.4
 RUN pip install pyyaml
 RUN pip install requests
 
