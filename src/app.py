@@ -40,12 +40,17 @@ while running:
         for recentchange in recentchanges:
             page_title = recentchange['title']
             page = pywikibot.Page(site,page_title)
+            print("Page: {}".format(page_title))
             if wtlpywikibot.get_category_status(site,page,"Structure"):
+                print("\tThis page is a 'Structure' page")
                 wtlpywikibot.set_category_status(site, page, "Broken PDF",False)
             else:
+                print("\tChecking this page...")
                 isCheckOK, message = wtlpywikibot.checkPDFforPage(site,page_title)
                 needNotification = wtlpywikibot.set_category_status(site, page, "Broken PDF",not isCheckOK)
                 if needNotification:
+                    print("\tSend the notification.")
+                    print("\tPDF status: {}".format(isCheckOK))
                     data = {}
                     data["title"] = page_title
                     data["page_url"] = page_url
