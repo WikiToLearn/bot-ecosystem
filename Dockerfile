@@ -1,6 +1,4 @@
-FROM wikitolearn/pywikibot:0.2.4
-RUN pip install pyyaml
-RUN pip install requests
+FROM wikitolearn/pywikibot:0.2.5
 
 ADD ./src/ /opt/
 WORKDIR /opt/

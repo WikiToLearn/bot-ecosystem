@@ -1,25 +1,12 @@
 #!/usr/bin/env python
-import yaml
-import os, sys
+import wtl
 import wtlpywikibot
 import pywikibot
-from pywikibot import pagegenerators
-from pywikibot import textlib
 import datetime
 import time
 import requests
 
-def send(data,notify_type):
-    protocol = config['gateway']['protocol']
-    hostname = config['gateway']['hostname']
-    port = config['gateway']['port']
-    token = config['gateway']['token']
-    url = '{}://{}:{}/api/sendNotify'.format(protocol,hostname,port)
-    data_to_send = {"service": config['gateway']['service'],"type":notify_type,"token":token,"payload":data}
-    r = requests.post(url, json=data_to_send)
-
-stream = open('config.yaml', 'r')
-config = yaml.load(stream, Loader=yaml.Loader)
+config = wtl.load_config(config_dir="/etc/pdfcheck-pages/")
 
 DELTATIME=config['global']['deltatime']
 
@@ -55,9 +42,9 @@ while running:
                     data["title"] = page_title
                     data["page_url"] = page_url
                     if isCheckOK:
-                        send(data,"fixed")
+                        wtl.send_notify(data,"fixed",config['gateway'])
                     else:
-                        send(data,"error")
+                        wtl.send_notify(data,"error",config['gateway'])
             print(recentchange)
         print("\n")
     unix_time_end = int(time.time())
