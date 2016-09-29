@@ -5,6 +5,7 @@ import pywikibot
 import datetime
 import time
 import requests
+import urllib.parse
 
 config = wtl.load_config(config_dir="/etc/pdfcheck-pages/")
 
@@ -40,7 +41,7 @@ while running:
                     print("\tPDF status: {}".format(isCheckOK))
                     data = {}
                     data["title"] = page_title
-                    data["page_url"] = page_url
+                    data["page_url"] = site.family.protocol(site.code) + "://" + site.family.hostname(site.code) + "/" + urllib.parse.quote(page_title)
                     if isCheckOK:
                         wtl.send_notify(data,"fixed",config['gateway'])
                     else:
