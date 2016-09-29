@@ -28,24 +28,27 @@ while running:
         for recentchange in recentchanges:
             page_title = recentchange['title']
             page = pywikibot.Page(site,page_title)
-            print("Page: {}".format(page_title))
-            if wtlpywikibot.get_category_status(site,page,"Structure"):
-                print("\tThis page is a 'Structure' page")
-                wtlpywikibot.set_category_status(site, page, "Broken PDF",False)
+            if page.namespace() == "Template:":
+                print("{} is a template...".format(page_title))
             else:
-                print("\tChecking this page...")
-                isCheckOK, message = wtlpywikibot.checkPDFforPage(site,page_title)
-                needNotification = wtlpywikibot.set_category_status(site, page, "Broken PDF",not isCheckOK)
-                if needNotification:
-                    print("\tSend the notification.")
-                    print("\tPDF status: {}".format(isCheckOK))
-                    data = {}
-                    data["title"] = page_title
-                    data["page_url"] = site.family.protocol(site.code) + "://" + site.family.hostname(site.code) + "/" + urllib.parse.quote(page_title)
-                    if isCheckOK:
-                        wtl.send_notify(data,"fixed",config['gateway'])
-                    else:
-                        wtl.send_notify(data,"error",config['gateway'])
+                print("Page: {}".format(page_title))
+                if wtlpywikibot.get_category_status(site,page,"Structure"):
+                    print("\tThis page is a 'Structure' page")
+                    wtlpywikibot.set_category_status(site, page, "Broken PDF",False)
+                else:
+                    print("\tChecking this page...")
+                    isCheckOK, message = wtlpywikibot.checkPDFforPage(site,page_title)
+                    needNotification = wtlpywikibot.set_category_status(site, page, "Broken PDF",not isCheckOK)
+                    if needNotification:
+                        print("\tSend the notification.")
+                        print("\tPDF status: {}".format(isCheckOK))
+                        data = {}
+                        data["title"] = page_title
+                        data["page_url"] = site.family.protocol(site.code) + "://" + site.family.hostname(site.code) + "/" + urllib.parse.quote(page_title)
+                        if isCheckOK:
+                            wtl.send_notify(data,"fixed",config['gateway'])
+                        else:
+                            wtl.send_notify(data,"error",config['gateway'])
             print(recentchange)
         print("\n")
     unix_time_end = int(time.time())
