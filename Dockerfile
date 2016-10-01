@@ -1,4 +1,4 @@
-FROM wikitolearn/pywikibot:0.2.6
+FROM wikitolearn/pywikibot:0.2.7
 
 ADD ./src/ /opt/
 WORKDIR /opt/

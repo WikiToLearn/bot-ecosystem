@@ -16,7 +16,7 @@ time_debit = 0
 while running:
     unix_time_start = int(time.time())
     for lang in config['pywikibot']['langs']:
-        site = pywikibot.Site(lang,'wikitolearn')
+        site = wtlpywikibot.site(lang)
         site_hostname = site.family.hostname(lang)
 
         if 'pywikibot' in config and 'username' in config['pywikibot'] and 'password' in config['pywikibot']:
