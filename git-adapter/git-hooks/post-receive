@@ -1,0 +1,84 @@
+#!/bin/bash
+#
+# copy this file to hooks/common/post-receive
+#
+SERVER="localhost" # you have to replace this with your git-adapter hostname
+reponame=$(pwd | awk -F"/" '{ print $NF }')
+
+read from to ref
+
+ref_type=$(echo $ref | awk -F'/' '{ print $2 }')
+ref_name=$(echo $ref | awk -F'/' '{ print $3 }')
+
+if [[ "$from" == "0000000000000000000000000000000000000000" ]] ; then
+    curl \
+        -X POST \
+        --connect-timeout 5 \
+        --max-time 100 \
+        --retry 5 \
+        --retry-delay 1 \
+        --retry-max-time 60 \
+        --data-urlencode "reponame=$reponame" \
+        --data-urlencode "ref_type=$ref_type" \
+        --data-urlencode "ref_name=$ref_name" \
+        $SERVER/ref/added &> /dev/null
+    if [[ "$ref_type" == "heads" ]] ; then
+        for commit in $(grep -Fvf <(git log --pretty=format:'%H - %s') <(git log $ref_name --pretty=format:'%H - %s') | awk '{ print $1 }')
+        do
+            git show -s --format=%B $commit &> /tmp/$commit.message
+            committer_email=$(git show -s --format=%ce $commit)
+            committer_name=$(git show -s --format=%cn $commit)
+            curl \
+                -X POST \
+                --connect-timeout 5 \
+                --max-time 100 \
+                --retry 5 \
+                --retry-delay 1 \
+                --retry-max-time 60 \
+                --data-urlencode "reponame=$reponame" \
+                --data-urlencode commit_message@/tmp/$commit.message \
+                --data-urlencode "ref_type=$ref_type" \
+                --data-urlencode "ref_name=$ref_name" \
+                --data-urlencode "commit=$commit" \
+                --data-urlencode "committer_email=$committer_email" \
+                --data-urlencode "committer_name=$committer_name" \
+                $SERVER/commit &> /dev/null
+            rm /tmp/$commit.message
+        done
+    fi
+elif [[ "$to" == "0000000000000000000000000000000000000000" ]] ; then
+    curl \
+        -X POST \
+        --connect-timeout 5 \
+        --max-time 100 \
+        --retry 5 \
+        --retry-delay 1 \
+        --retry-max-time 60 \
+        --data-urlencode "reponame=$reponame" \
+        --data-urlencode "ref_type=$ref_type" \
+        --data-urlencode "ref_name=$ref_name" \
+        $SERVER/ref/deleted &> /dev/null
+else
+    for commit in $(git rev-list $from..$to)
+    do
+        git show -s --format=%B $commit &> /tmp/$commit.message
+        committer_email=$(git show -s --format=%ce $commit)
+        committer_name=$(git show -s --format=%cn $commit)
+        curl \
+            -X POST \
+            --connect-timeout 5 \
+            --max-time 100 \
+            --retry 5 \
+            --retry-delay 1 \
+            --retry-max-time 60 \
+            --data-urlencode "reponame=$reponame" \
+            --data-urlencode commit_message@/tmp/$commit.message \
+            --data-urlencode "ref_type=$ref_type" \
+            --data-urlencode "ref_name=$ref_name" \
+            --data-urlencode "commit=$commit" \
+            --data-urlencode "committer_email=$committer_email" \
+            --data-urlencode "committer_name=$committer_name" \
+            $SERVER/commit &> /dev/null
+        rm /tmp/$commit.message
+    done
+fi
