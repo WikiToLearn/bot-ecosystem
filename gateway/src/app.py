@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import wtl
 import telegram
+import time
 
 from jinja2 import Template
 from flask import Flask
@@ -12,12 +13,12 @@ import re
 
 import sys
 
-def costum_excepthook(exctype, value, traceback):
-    print("Exception: ")
-    print("\t{}".format(exctype))
-    print("\t{}".format(value))
-    print("\t{}".format(traceback))
-sys.excepthook = costum_excepthook
+#def costum_excepthook(exctype, value, traceback):
+#    print("Exception: ")
+#    print("\t{}".format(exctype))
+#    print("\t{}".format(value))
+#    print("\t{}".format(traceback))
+#sys.excepthook = costum_excepthook
 
 app = Flask(__name__)
 
@@ -77,7 +78,7 @@ def send_to_destinations(destinations,reply,payload):
                 template = Template(destination['message'])
                 rocketchat_msg = template.render(**payload)
                 reply["sent"].append(destination)
-                rocketchat_bots[destination['outgoing_id']].rooms_send(
+                rocketchat_bots[destination['outgoing_id']].chat_postMessage(
                     channel, rocketchat_msg)
     if len(reply["sent"]) == 0:
         print("Not sent:")
