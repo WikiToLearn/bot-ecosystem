@@ -35,15 +35,6 @@ def github_push_post():
         repo_name = request.json['repository']['name']
         branch = request.json['ref'].split('/')[2]
         for commit in request.json['commits']:
-            ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            chars=[]
-            for i in range(16):
-                chars.append(random.choice(ALPHABET))
-            code = "".join(chars)
-
-            data_to_send = {"code":code,"url":commit['url']}
-            r = requests.post("https://git.io/create", data=data_to_send)
-
             wtl.send_notify({
             "repo":repo_name,
             "branch":branch,
@@ -51,7 +42,7 @@ def github_push_post():
             "commit_author_name":commit['author']['name'],
             "commit_message":commit['message'],
             "commit_url":commit['url'],
-            "commit_url_short":"https://git.io/{}".format(r.text)
+            "commit_url_short":commit['url'],
             },"commit",config['gateway'])
     return "OK"
 
