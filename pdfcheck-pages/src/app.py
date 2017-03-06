@@ -19,19 +19,12 @@ while running:
         site = wtlpywikibot.site(lang)
         site_hostname = site.family.hostname(lang)
 
-        if 'pywikibot' in config and 'username' in config['pywikibot'] and 'password' in config['pywikibot']:
-            username=config['pywikibot']['username']
-            password=config['pywikibot']['password']
-            wtlpywikibot.login(site,username,password)
-
         recentchanges = site.recentchanges(topOnly = True, end=site.getcurrenttime()- (datetime.timedelta(seconds=DELTATIME+ time_debit)))
         for recentchange in recentchanges:
             page_title = recentchange['title']
             page = pywikibot.Page(site,page_title)
             check = False
-            if page.namespace() == "Template:":
-                print("{} is a template...".format(page_title))
-            elif page.namespace() == "Course:":
+            if page.namespace() == "Course:":
                 print("Is in the Course namespace...")
                 if len(page.title().split('/')) == 3:
                     print("Is a page in the 3th level =>  check")
@@ -42,37 +35,27 @@ while running:
                     print("Is a page in the 4th level => check")
                     check = True
             if check:
-                print("Page: {}".format(page_title))
-                if wtlpywikibot.get_category_status(site,page,"Structure"):
-                    print("\tThis page is a 'Structure' page")
-                    wtlpywikibot.set_category_status(site, page, "Broken PDF",False)
+                print("\tChecking this page...")
+                broken_math = []
+                for math in wtlpywikibot.extract_math(page.text):
+                    print("Math:")
+                    print(math)
+                    try:
+                        print("Status: {}".format(wtlpywikibot.check_formula(site,math)))
+                    except Exception as e:
+                        broken_math.append(math)
+                        print(e)
+                    print()
+                isCheckOK, message = wtlpywikibot.checkPDFforPage(site,page_title)
+                print("\tPDF status: {}".format(isCheckOK))
+                data = {}
+                data["title"] = page_title
+                data["page_url"] = site.family.protocol(site.code) + "://" + site.family.hostname(site.code) + "/" + urllib.parse.quote(page_title)
+                data["broken_math"] = broken_math
+                if isCheckOK:
+                    wtl.send_notify(data,"success",config['gateway'])
                 else:
-                    print("\tChecking this page...")
-                    broken_math = []
-                    for math in wtlpywikibot.extract_math(page.text):
-                        print("Math:")
-                        print(math)
-                        try:
-                            print("Status: {}".format(wtlpywikibot.check_formula(site,math)))
-                        except Exception as e:
-                            broken_math.append(math)
-                            print(e)
-                        print()
-                    isCheckOK, message = wtlpywikibot.checkPDFforPage(site,page_title)
-                    needNotification = wtlpywikibot.set_category_status(site, page, "Broken PDF",not isCheckOK)
-                    if needNotification:
-                        print("\tSend the notification.")
-                        print("\tPDF status: {}".format(isCheckOK))
-                        data = {}
-                        data["title"] = page_title
-                        data["page_url"] = site.family.protocol(site.code) + "://" + site.family.hostname(site.code) + "/" + urllib.parse.quote(page_title)
-                        data["broken_math"] = broken_math
-                        if isCheckOK:
-                            wtl.send_notify(data,"fixed",config['gateway'])
-                        else:
-                            wtl.send_notify(data,"error",config['gateway'])
-            print(recentchange)
-        print("\n")
+                    wtl.send_notify(data,"error",config['gateway'])
     unix_time_end = int(time.time())
     waiting_time=DELTATIME - (unix_time_end-unix_time_start)
     if waiting_time > 0:
