@@ -10,13 +10,16 @@ config = wtl.load_config(config_dir="/etc/edit-notify/")
 
 DELTATIME = config['global']['deltatime']
 
+debug = False
+
 running = True
 time_debit = 0
 while running:
     unix_time_start = int(time.time())
     for lang in config['pywikibot']['langs']:
         site = wtlpywikibot.site(lang)
-        print(lang)
+        if debug:
+            print(lang)
         recentchanges = site.recentchanges(topOnly=False, end=site.getcurrenttime(
         ) - (datetime.timedelta(seconds=DELTATIME + time_debit)))
         for recentchange in recentchanges:
