@@ -36,24 +36,27 @@ while running:
                 else:
                     data["broken_pages"] = []
                     for line in collection_page.text.split('\n'):
-                        if line[0:3]==":[[":
-                            page_title = line[3:-2]
-                            page = pywikibot.Page(site,page_title)
-                            broken_math = []
-                            for math in wtlpywikibot.extract_math(page.text):
-                                try:
-                                    print("Status: {}".format(wtlpywikibot.check_formula(site,math)))
-                                except Exception as e:
-                                    broken_math.append(math)
-                            dataPage = {}
-                            dataPage["title"] = page_title
-                            dataPage["page_url"] = site.family.protocol(site.code) + "://" + site.family.hostname(site.code) + "/" + urllib.parse.quote(page_title)
-                            dataPage["broken_math"] = broken_math
+                        try:
+                            if line[0:3]==":[[":
+                                page_title = line[3:-2]
+                                page = pywikibot.Page(site,page_title)
+                                broken_math = []
+                                for math in wtlpywikibot.extract_math(page.text):
+                                    try:
+                                        print("Status: {}".format(wtlpywikibot.check_formula(site,math)))
+                                    except Exception as e:
+                                        broken_math.append(math)
+                                dataPage = {}
+                                dataPage["title"] = page_title
+                                dataPage["page_url"] = site.family.protocol(site.code) + "://" + site.family.hostname(site.code) + "/" + urllib.parse.quote(page_title)
+                                dataPage["broken_math"] = broken_math
 
-                            isCheckPageOK, messagePage = wtlpywikibot.checkPDFforPage(site,page_title)
-                            if not isCheckPageOK:
-                                print(" Page {} is KO".format(page_title))
-                                data["broken_pages"].append(dataPage)
+                                isCheckPageOK, messagePage = wtlpywikibot.checkPDFforPage(site,page_title)
+                                if not isCheckPageOK:
+                                    print(" Page {} is KO".format(page_title))
+                                    data["broken_pages"].append(dataPage)
+                        except Exception as e:
+                            print(e)
                     wtl.send_notify(data,"error",config['gateway'])
                 report['lists'][isCheckOK].append(data)
 
