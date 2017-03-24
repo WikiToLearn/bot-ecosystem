@@ -69,17 +69,21 @@ def send_to_destinations(destinations,reply,payload):
             for channel in channels:
                 template = Template(destination['message'])
                 telegram_msg = template.render(**payload)
-                reply["sent"].append(destination)
-                telegram_bots[destination['outgoing_id']].sendMessage(
-                    channel, telegram_msg,disable_web_page_preview=True)
+                try:
+                    telegram_bots[destination['outgoing_id']].sendMessage(
+                        channel, telegram_msg,disable_web_page_preview=True)
+                    reply["sent"].append(destination)
+                except Exception as e:
+                    print(destination)
+                    print(e)
         elif config['outgoing'][destination['outgoing_id']]['type'] == "rocketchat":
             channels = find_channels(destination,payload)
             for channel in channels:
                 template = Template(destination['message'])
                 rocketchat_msg = template.render(**payload)
-                reply["sent"].append(destination)
                 rocketchat_bots[destination['outgoing_id']].chat_postMessage(
                     channel, rocketchat_msg)
+                reply["sent"].append(destination)
     if len(reply["sent"]) == 0:
         print("Not sent:")
         pprint(request.json)
